@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:music_app/Screens/player_screen.dart';
 import 'package:music_app/const/colors.dart';
 
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-
+import '../api/api_client.dart';
 import 'explore_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final RxList<dynamic> genres = <dynamic>[].obs;
+  late String Id;
 
   @override
   void initState() {
@@ -71,20 +72,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 4),
                   child: ListTile(
+                    onTap: () {
+                      Id = genre['id'].toString();
+                      print('Track Id ${Id}');
+                      Get.to(PlayerScreen(
+                        id: Id,
+                      ));
+                    },
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
                     tileColor: bgColor,
                     title: Text(
                       genre['name'],
                       style: GoogleFonts.montserrat(
-                          fontSize: 15,
+                          fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: whiteColor),
                     ),
                     subtitle: Text(
                       genre['count'].toString(),
                       style: GoogleFonts.montserrat(
-                          fontSize: 12,
+                          fontSize: 15,
                           fontWeight: FontWeight.w400,
                           color: whiteColor),
                     ),
@@ -93,38 +101,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: whiteColor,
                       size: 32,
                     ),
-                    trailing: Icon(
-                      Icons.play_arrow_sharp,
-                      color: whiteColor,
-                      size: 26,
+                    trailing: CircleAvatar(
+                      backgroundColor: Colors.teal,
+                      radius: 35,
+                      child: Icon(
+                        Icons.play_arrow_sharp,
+                        color: whiteColor,
+                        size: 40,
+                      ),
                     ),
                   ),
                 );
               },
             )));
-  }
-}
-
-class MusicBrainzAPI {
-  final String apiUrl = 'https://musicbrainz.org/ws/2/genre/all';
-  final String formatParam = 'fmt';
-  final String formatValue = 'json';
-
-  Future<List<dynamic>> getAllGenres() async {
-    final Uri uri = Uri.parse('$apiUrl?$formatParam=$formatValue');
-
-    try {
-      final response = await http.get(uri);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['genres'];
-      } else {
-        throw Exception('Failed to fetch genres');
-      }
-    } catch (e) {
-      print('Error: $e');
-      return [];
-    }
   }
 }

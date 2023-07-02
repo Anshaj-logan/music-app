@@ -5,6 +5,7 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'Screens/explore_screen.dart';
 import 'Screens/homeScreen.dart';
+import 'api/api_client.dart';
 
 void main() {
   Get.put(MusicBrainzAPI());
